@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?define Name = "Hosts Monitor" ?>
+<?define Manufacturer = "HdeSousa" ?>
+<?define Version = "1.0.3" ?>
+<?define UpgradeCode = "{1240E0CD-B3D2-44A7-B064-11B3C0709D69}" ?>
+
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" Name="$(var.Name)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)" Version="$(var.Version)" Language="1033">
+    <Package InstallerVersion="300" Compressed="yes"/>
+    <Media Id="1" Cabinet="HostsMonitor.cab" EmbedCab="yes" />
+    <MajorUpgrade DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit." />
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="ROOTDIRECTORY" Name="$(var.Manufacturer)">
+          <Directory Id="INSTALLFOLDER" Name="$(var.Name)" />
+        </Directory>
+      </Directory>
+    </Directory>
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Component Id="$(var.HostsMonitor.TargetFileName)">
+        <File Id="$(var.HostsMonitor.TargetFileName)" Source="$(var.HostsMonitor.TargetPath)" KeyPath="yes" />
+        <RemoveFile Id="ALLFILES" Name="*.*" On="both" />
+        <ServiceInstall Id="ServiceInstaller"
+        Type="ownProcess"
+        Name="HostsMonitor"
+        DisplayName="$(var.Name)"
+        Description="Service to monitor servers status"
+        Start="auto"
+        ErrorControl="normal" />
+        <ServiceControl Id="StartService" Start="install" Stop="both" Remove="uninstall" Name="HostsMonitor" Wait="yes" />
+      </Component>
+    </DirectoryRef>
+    <Feature Id="MainApplication" Title="Main Application" Level="1">
+      <ComponentRef Id="$(var.HostsMonitor.TargetFileName)" />
+    </Feature>
+  </Product>
+</Wix>
